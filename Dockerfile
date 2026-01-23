@@ -1,6 +1,7 @@
-FROM openjdk:17-jdk-slim
+FROM ubuntu:22.04
 
-WORKDIR /app
-COPY . /app
+RUN apt-get update && apt-get install -y \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
 
-CMD ["java", "-version"]
+CMD ["echo", "Docker image is working 🎉"]

@@ -1,4 +1,6 @@
-FROM ubuntu:22.04
-RUN apt update && apt install -y curl
-COPY app.sh /app.sh
-CMD ["bash", "/app.sh"]
+FROM openjdk:17-jdk-slim
+
+WORKDIR /app
+COPY . /app
+
+CMD ["java", "-version"]

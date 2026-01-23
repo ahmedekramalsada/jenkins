@@ -1,0 +1,42 @@
+pipeline {
+    agent any
+    environment {
+        AWS_CREDENTIALS = credentials('aws-credentials-id')
+        TF_PATH = 'task5/terraform'
+        ANSIBLE_PATH = 'task5/ansible'
+    }
+    stages {
+        stage('Terraform Init') {
+            steps {
+                dir(env.TF_PATH) {
+                    sh 'terraform init'
+                }
+            }
+        }
+        stage('Terraform Apply') {
+            steps {
+                dir(env.TF_PATH) {
+                    sh 'terraform apply -auto-approve'
+                }
+            }
+        }
+        stage('Capture IP') {
+            steps {
+                script {
+                    env.INSTANCE_IP = sh(script: "cd ${env.TF_PATH} && terraform output -raw public_ip", returnStdout: true).trim()
+                    echo "Instance IP: ${env.INSTANCE_IP}"
+                }
+            }
+        }
+        stage('Ansible Provision') {
+            steps {
+                dir(env.ANSIBLE_PATH) {
+                    // Create temporary inventory
+                    sh "echo '${env.INSTANCE_IP} ansible_user=ec2-user' > inventory.ini"
+                    // Running ansible (Assumes SSH key is configured in Jenkins or via ssh-agent)
+                    sh "ansible-playbook -i inventory.ini playbook.yml"
+                }
+            }
+        }
+    }
+}

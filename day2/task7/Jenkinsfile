@@ -1,0 +1,28 @@
+pipeline {
+    agent any
+    parameters {
+        string(name: 'INSTANCE_IP', defaultValue: '', description: 'Public IP of the EC2 instance')
+        string(name: 'SSH_USER', defaultValue: 'ec2-user', description: 'SSH User')
+        string(name: 'SSH_CREDENTIAL_ID', defaultValue: 'my-ssh-key-id', description: 'Jenkins SSH Credential ID')
+    }
+    stages {
+        stage('Monitor System') {
+            steps {
+                script {
+                    if (!params.INSTANCE_IP) {
+                        error "INSTANCE_IP parameter is required"
+                    }
+                    echo "Checking CPU and RAM on ${params.INSTANCE_IP}..."
+                    
+                    sshagent([params.SSH_CREDENTIAL_ID]) {
+                        sh """
+                            ssh -o StrictHostKeyChecking=no ${params.SSH_USER}@${params.INSTANCE_IP} \
+                            'echo "--- CPU Usage ---"; top -bn1 | grep "Cpu(s)" ; \
+                             echo "--- Memory Usage ---"; free -m'
+                        """
+                    }
+                }
+            }
+        }
+    }
+}

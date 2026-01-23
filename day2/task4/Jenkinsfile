@@ -1,0 +1,18 @@
+pipeline {
+    agent any
+    properties [
+        pipelineTriggers([githubPush()])
+    ]
+    stages {
+        stage('Webhook Received') {
+            steps {
+                echo "Build triggered by GitHub Webhook"
+            }
+        }
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+    }
+}

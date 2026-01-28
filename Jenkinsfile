@@ -1,38 +1,19 @@
 pipeline {
     agent any
     stages {
-        stage('Identify Branch') {
-            steps {
-                echo "Building on branch: ${env.BRANCH_NAME}"
-            }
-        }
         stage('Build') {
             steps {
-                echo "Performing build for ${env.BRANCH_NAME}..."
+                echo "Building application for Development..."
             }
         }
-        stage('Deploy to Dev') {
-            when {
-                branch 'dev'
-            }
+        stage('Unit Tests') {
             steps {
-                echo "Deploying to Development Environment"
+                echo "Running fast unit tests..."
             }
         }
-        stage('Deploy to Test') {
-            when {
-                branch 'test'
-            }
+        stage('Notify') {
             steps {
-                echo "Deploying to Testing Environment"
-            }
-        }
-        stage('Deploy to Master') {
-            when {
-                branch 'master'
-            }
-            steps {
-                echo "Deploying to Production (Master)"
+                echo "Dev Build Successful. Ready for PR to Test branch."
             }
         }
     }

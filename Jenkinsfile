@@ -1,38 +1,19 @@
 pipeline {
     agent any
     stages {
-        stage('Identify Branch') {
+        stage('Build & Security Scan') {
             steps {
-                echo "Building on branch: ${env.BRANCH_NAME}"
+                echo "Building Production Artifacts and running security scans..."
             }
         }
-        stage('Build') {
+        stage('Approval Gate') {
             steps {
-                echo "Performing build for ${env.BRANCH_NAME}..."
+                input message: "Does the Staging environment look good? Approve for Production?"
             }
         }
-        stage('Deploy to Dev') {
-            when {
-                branch 'dev'
-            }
+        stage('Deploy to Production') {
             steps {
-                echo "Deploying to Development Environment"
-            }
-        }
-        stage('Deploy to Test') {
-            when {
-                branch 'test'
-            }
-            steps {
-                echo "Deploying to Testing Environment"
-            }
-        }
-        stage('Deploy to Master') {
-            when {
-                branch 'master'
-            }
-            steps {
-                echo "Deploying to Production (Master)"
+                echo "🚀 Deploying to Production Servers..."
             }
         }
     }

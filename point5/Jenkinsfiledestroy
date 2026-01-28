@@ -8,7 +8,7 @@ pipeline {
         stage('Destroy Infrastructure') {
             steps {
                 // Point this to the same folder where your main.tf is
-                dir('lab2-task5') {
+                dir('point5') {
                     sh 'terraform init'
                     sh 'terraform destroy -auto-approve'
                 }

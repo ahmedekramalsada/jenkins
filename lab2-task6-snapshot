@@ -1,0 +1,29 @@
+pipeline {
+    agent any
+    triggers {
+        cron('*/5 * * * *') // This tells Jenkins to run every 5 minutes
+    }
+    environment {
+        AWS_ACCESS_KEY_ID     = credentials('aws-access-key')
+        AWS_SECRET_ACCESS_KEY = credentials('aws-secret-key')
+        REGION                = 'us-east-1'
+    }
+    stages {
+        stage('Snapshot EBS Volume') {
+            steps {
+                script {
+                    // 1. Get the Volume ID of your EC2 instance (tagged in Task 5)
+                    def volumeId = sh(script: "aws ec2 describe-volumes --filters Name=tag:Name,Values=Jenkins-Ansible-Node --query 'Volumes[0].VolumeId' --output text --region ${REGION}", returnStdout: true).trim()
+                    
+                    if (volumeId == "None" || volumeId == "") {
+                        error "Could not find Volume for Jenkins-Ansible-Node. Is the EC2 running?"
+                    }
+
+                    // 2. Create the Snapshot
+                    sh "aws ec2 create-snapshot --volume-id ${volumeId} --description 'Automated 5-min backup from Jenkins' --region ${REGION}"
+                    echo "Snapshot initiated for volume: ${volumeId}"
+                }
+            }
+        }
+    }
+}

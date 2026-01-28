@@ -7,5 +7,10 @@ resource "aws_instance" "web_server" {
 
   tags = { Name = "Jenkins-Ansible-Node" }
 }
-
+ingress {
+  from_port   = 22
+  to_port     = 22
+  protocol    = "tcp"
+  cidr_blocks = ["0.0.0.0/0"] # Open temporarily to verify
+}
 output "public_ip" { value = aws_instance.web_server.public_ip }

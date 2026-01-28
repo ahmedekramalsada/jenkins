@@ -7,7 +7,7 @@ pipeline {
     stages {
         stage('Terraform Apply') {
             steps {
-                dir('lab2-task5') {
+                dir('point5') {
                     sh 'terraform init'
                     sh 'terraform apply -auto-approve'
                     // Save the IP to a file for Ansible
@@ -17,7 +17,7 @@ pipeline {
         }
         stage('Ansible Install Nginx') {
             steps {
-                dir('lab2-task5') {
+                dir('point5') {
                     script {
                         def ip = readFile('ec2_ip.txt').trim()
                         // Run ansible using the dynamic IP

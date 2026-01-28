@@ -1,0 +1,26 @@
+pipeline {
+    agent any
+    stages {
+        stage('Monitor Stats') {
+            steps {
+                script {
+                    // Get the IP of your instance (captured in Task 5 or from AWS console)
+                    def ip = "PASTE_YOUR_EC2_PUBLIC_IP_HERE" 
+                    
+                    withCredentials([sshUserPrivateKey(credentialsId: 'aws-ssh-key', keyFileVariable: 'SSH_KEY')]) {
+                        sh """
+                        ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ubuntu@${ip} << 'EOF'
+                        echo "--- Memory Usage ---"
+                        free -m
+                        echo "--- CPU Load ---"
+                        uptime
+                        echo "--- Disk Space ---"
+                        df -h | grep '^/dev/'
+EOF
+                        """
+                    }
+                }
+            }
+        }
+    }
+}

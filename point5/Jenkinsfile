@@ -15,14 +15,32 @@ pipeline {
                 }
             }
         }
-        stage('Ansible Install Nginx') {
-            steps {
-                dir('point5') {
-                    script {
-                        def ip = readFile('ec2_ip.txt').trim()
-                        // Run ansible using the dynamic IP
-                        sh "ansible-playbook -i ${ip}, -u ubuntu --private-key ${credentials('aws-ssh-key')} playbook.yml"
-                    }
+       stage('Configuration: Ansible') {
+    steps {
+        dir('point5') {
+            script {
+                // 1. Read the IP and strip any whitespace/newlines
+                def ip = readFile('ec2_ip.txt').trim()
+                
+                // 2. Wait for the server to be ready
+                echo "Waiting for EC2 at ${ip} to wake up..."
+                sleep 30
+                
+                // 3. Use the credentials helper to run Ansible
+                withCredentials([sshUserPrivateKey(credentialsId: 'aws-ssh-key', keyFileVariable: 'SSH_KEY')]) {
+                    // We use triple double-quotes (""") to handle variable interpolation safely
+                    sh """
+                    ansible-playbook -i ${ip}, \
+                    -u ubuntu \
+                    --private-key ${SSH_KEY} \
+                    -e "ansible_ssh_common_args='-o StrictHostKeyChecking=no'" \
+                    playbook.yml
+                    """
+                }
+            }
+        }
+    }
+}
                 }
             }
         }

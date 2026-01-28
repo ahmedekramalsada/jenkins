@@ -1,38 +1,19 @@
 pipeline {
     agent any
+    parameters {
+        choice(name: 'ENVIRONMENT', choices: ['dev', 'test', 'prod'], description: 'Select the target environment')
+        booleanParam(name: 'RUN_TESTS', defaultValue: true, description: 'Check to run unit tests')
+    }
     stages {
-        stage('Identify Branch') {
+        stage('Initialize') {
             steps {
-                echo "Building on branch: ${env.BRANCH_NAME}"
+                echo "Deploying to: ${params.ENVIRONMENT}"
             }
         }
-        stage('Build') {
+        stage('Conditional Test') {
+            when { expression { params.RUN_TESTS == true } }
             steps {
-                echo "Performing build for ${env.BRANCH_NAME}..."
-            }
-        }
-        stage('Deploy to Dev') {
-            when {
-                branch 'dev'
-            }
-            steps {
-                echo "Deploying to Development Environment"
-            }
-        }
-        stage('Deploy to Test') {
-            when {
-                branch 'test'
-            }
-            steps {
-                echo "Deploying to Testing Environment"
-            }
-        }
-        stage('Deploy to Master') {
-            when {
-                branch 'master'
-            }
-            steps {
-                echo "Deploying to Production (Master)"
+                echo "Running unit tests for ${params.ENVIRONMENT}..."
             }
         }
     }

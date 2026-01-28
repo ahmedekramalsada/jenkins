@@ -1,0 +1,18 @@
+pipeline {
+    agent any
+    environment {
+        AWS_ACCESS_KEY_ID     = credentials('aws-access-key')
+        AWS_SECRET_ACCESS_KEY = credentials('aws-secret-key')
+    }
+    stages {
+        stage('Destroy Infrastructure') {
+            steps {
+                // Point this to the same folder where your main.tf is
+                dir('lab2-task5') {
+                    sh 'terraform init'
+                    sh 'terraform destroy -auto-approve'
+                }
+            }
+        }
+    }
+}

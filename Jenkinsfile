@@ -1,38 +1,20 @@
 pipeline {
     agent any
     stages {
-        stage('Identify Branch') {
-            steps {
-                echo "Building on branch: ${env.BRANCH_NAME}"
-            }
-        }
         stage('Build') {
             steps {
-                echo "Performing build for ${env.BRANCH_NAME}..."
+                echo "Building application for Testing/QA..."
             }
         }
-        stage('Deploy to Dev') {
-            when {
-                branch 'dev'
-            }
+        stage('Integration Tests') {
             steps {
-                echo "Deploying to Development Environment"
+                echo "Running heavy integration and smoke tests..."
             }
         }
-        stage('Deploy to Test') {
-            when {
-                branch 'test'
-            }
+        stage('Deploy to Staging') {
             steps {
-                echo "Deploying to Testing Environment"
-            }
-        }
-        stage('Deploy to Master') {
-            when {
-                branch 'master'
-            }
-            steps {
-                echo "Deploying to Production (Master)"
+                echo "Deploying to QA/Staging environment..."
+                // Example: sh 'kubectl apply -f deployment.yaml'
             }
         }
     }

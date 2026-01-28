@@ -24,7 +24,7 @@ pipeline {
                 
                 // 2. Wait for the server to be ready
                 echo "Waiting for EC2 at ${ip} to wake up..."
-                sleep 30
+                sleep 60
                 
                 // 3. Use the credentials helper to run Ansible
                 withCredentials([sshUserPrivateKey(credentialsId: 'aws-ssh-key', keyFileVariable: 'SSH_KEY')]) {
